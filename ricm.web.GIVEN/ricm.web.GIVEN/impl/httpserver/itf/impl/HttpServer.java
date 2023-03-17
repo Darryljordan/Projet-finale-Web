@@ -12,6 +12,8 @@ import java.util.StringTokenizer;
 import httpserver.itf.HttpRequest;
 import httpserver.itf.HttpResponse;
 import httpserver.itf.HttpRicmlet;
+import httpserver.itf.HttpRicmletRequest;
+import httpserver.itf.HttpRicmletRequestImpl;
 
 
 /**
@@ -70,7 +72,12 @@ public class HttpServer {
 		String method = parseline.nextToken().toUpperCase(); 
 		String ressname = parseline.nextToken();
 		if (method.equals("GET")) {
-			request = new HttpStaticRequest(this, method, ressname);
+			StringTokenizer token = new StringTokenizer(ressname, "/");
+			String dynamic = token.nextToken();
+			if(dynamic.equals("ricmlets"))
+				request = new HttpRicmletRequestImpl(this, method, ressname, br);
+			else 
+				request = new HttpStaticRequest(this, method, ressname);
 		} else 
 			request = new UnknownRequest(this, method, ressname);
 		return request;
@@ -92,7 +99,7 @@ public class HttpServer {
 		try {
 			while (true) {
 				Socket soc = m_ssoc.accept();
-				(new HttpWorker(this, soc)).start();
+				(new HttpWorker(this, soc)).start(); //Creating the walker for the socket it just accepted. Change here to for the worker pool
 			}
 		} catch (IOException e) {
 			System.out.println("HttpServer Exception, skipping request");
