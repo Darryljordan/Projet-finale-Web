@@ -23,7 +23,17 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest{
 	@Override
 	public String getArg(String name) {
 		// TODO Auto-generated method stub
-		return null;
+		String argument = this.getRessname();
+		argument = argument.substring(argument.indexOf('?')+1);
+		String[] arguments = argument.split("&");
+		String value = null;
+		for(int i = 0; i < arguments.length; i++) {
+			String test = arguments[i].substring(0, arguments[i].indexOf("="));
+			if(test.equals(name)) {
+				value = arguments[i].substring(arguments[i].indexOf('=')+1);
+			}
+		}
+		return value;
 	}
 
 	@Override
