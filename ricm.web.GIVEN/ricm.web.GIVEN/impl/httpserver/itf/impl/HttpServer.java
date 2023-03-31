@@ -15,6 +15,7 @@ import httpserver.itf.HttpResponse;
 import httpserver.itf.HttpRicmlet;
 import httpserver.itf.HttpRicmletRequest;
 import httpserver.itf.HttpRicmletRequestImpl;
+import httpserver.itf.HttpRicmletResponseImpl;
 
 
 /**
@@ -32,7 +33,7 @@ public class HttpServer {
 	private int m_port;
 	private File m_folder;  // default folder for accessing static resources (files)
 	private ServerSocket m_ssoc;
-	private HashMap<String, Integer> classes = new HashMap<>();
+	private HashMap<String, Class<?>> classes;
 
 	protected HttpServer(int port, String folderName) {
 		m_port = port;
@@ -46,13 +47,14 @@ public class HttpServer {
 			System.out.println("HttpServer Exception:" + e );
 			System.exit(1);
 		}
+		classes = new HashMap<>();
 	}
 	
 	public File getFolder() {
 		return m_folder;
 	}
 	
-	public HashMap<String, Integer> getHashMap(){
+	public HashMap<String, Class<?>> getHashMap(){
 		return this.classes;
 	}
 	
@@ -60,7 +62,17 @@ public class HttpServer {
 	public HttpRicmlet getInstance(String clsname)
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException, MalformedURLException, 
 			IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
-		throw new Error("No Support for Ricmlets");
+		Class<?> c;
+		HttpRicmlet ricmlet;
+		if(!classes.containsKey(clsname)) {
+			c = Class.forName(clsname); //Creates the class
+			ricmlet = (HttpRicmlet)c.getDeclaredConstructor().newInstance();
+			classes.put(clsname, c);
+		}else {
+			c = classes.get(clsname);
+			ricmlet = (HttpRicmlet)c.getDeclaredConstructor().newInstance();
+		}
+		return ricmlet;
 	}
 
 
@@ -78,11 +90,8 @@ public class HttpServer {
 		String ressname = parseline.nextToken();
 		try {
 			if (method.equals("GET")) {
-				StringTokenizer token = new StringTokenizer(ressname, "/");
-				String dynamic = token.nextToken();
-				dynamic = token.nextToken();
 				try {
-					if(dynamic.equals("ricmlets")) {
+					if(ressname.contains("ricmlets")) {
 						request = new HttpRicmletRequestImpl(this, method, ressname, br);
 					}
 					else 
@@ -106,6 +115,9 @@ public class HttpServer {
 	 * Returns an HttpResponse object associated to the given HttpRequest object
 	 */
 	public HttpResponse getResponse(HttpRequest req, PrintStream ps) {
+		if(req instanceof HttpRicmletRequestImpl) {
+			return new HttpRicmletResponseImpl(this, req, ps);
+		}
 		return new HttpResponseImpl(this, req, ps);
 	}
 
