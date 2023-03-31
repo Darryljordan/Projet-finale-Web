@@ -7,6 +7,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.StringTokenizer;
 
 import httpserver.itf.HttpRequest;
@@ -31,6 +32,7 @@ public class HttpServer {
 	private int m_port;
 	private File m_folder;  // default folder for accessing static resources (files)
 	private ServerSocket m_ssoc;
+	private HashMap<String, Integer> classes = new HashMap<>();
 
 	protected HttpServer(int port, String folderName) {
 		m_port = port;
@@ -50,6 +52,9 @@ public class HttpServer {
 		return m_folder;
 	}
 	
+	public HashMap<String, Integer> getHashMap(){
+		return this.classes;
+	}
 	
 
 	public HttpRicmlet getInstance(String clsname)
@@ -64,22 +69,35 @@ public class HttpServer {
 	/*
 	 * Reads a request on the given input stream and returns the corresponding HttpRequest object
 	 */
-	public HttpRequest getRequest(BufferedReader br) throws IOException {
+	public HttpRequest getRequest(BufferedReader br) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		HttpRequest request = null;
 		
 		String startline = br.readLine();
 		StringTokenizer parseline = new StringTokenizer(startline);
 		String method = parseline.nextToken().toUpperCase(); 
 		String ressname = parseline.nextToken();
-		if (method.equals("GET")) {
-			StringTokenizer token = new StringTokenizer(ressname, "/");
-			String dynamic = token.nextToken();
-			if(dynamic.equals("ricmlets"))
-				request = new HttpRicmletRequestImpl(this, method, ressname, br);
-			else 
-				request = new HttpStaticRequest(this, method, ressname);
-		} else 
-			request = new UnknownRequest(this, method, ressname);
+		try {
+			if (method.equals("GET")) {
+				StringTokenizer token = new StringTokenizer(ressname, "/");
+				String dynamic = token.nextToken();
+				dynamic = token.nextToken();
+				try {
+					if(dynamic.equals("ricmlets")) {
+						request = new HttpRicmletRequestImpl(this, method, ressname, br);
+					}
+					else 
+						request = new HttpStaticRequest(this, method, ressname);
+				} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
+						| InvocationTargetException | NoSuchMethodException | SecurityException | IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else 
+				request = new UnknownRequest(this, method, ressname);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return request;
 	}
 
