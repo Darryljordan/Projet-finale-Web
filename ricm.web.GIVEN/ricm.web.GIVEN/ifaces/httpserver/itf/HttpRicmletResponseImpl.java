@@ -3,6 +3,7 @@ package httpserver.itf;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Date;
+import java.util.HashMap;
 
 import httpserver.itf.impl.HttpServer;
 
@@ -11,6 +12,7 @@ public class HttpRicmletResponseImpl implements HttpRicmletResponse{
 	protected HttpServer m_hs;
 	protected PrintStream m_ps;
 	protected HttpRequest m_req;
+	protected HashMap<String, String> cookies = new HashMap<String, String>();
 
 	public HttpRicmletResponseImpl(HttpServer hs, HttpRequest req, PrintStream ps) {
 		m_hs = hs;
@@ -22,6 +24,9 @@ public class HttpRicmletResponseImpl implements HttpRicmletResponse{
 		// TODO Auto-generated method stub
 		m_ps.println("HTTP/1.0 200 OK");
 		m_ps.println("Date: " + new Date());
+		cookies.forEach((name, value)->{
+			m_ps.println("Set-Cookie: " + name + "=" + value);
+		});
 		m_ps.println("Server: ricm-http 1.0");
 	}
 
@@ -60,7 +65,6 @@ public class HttpRicmletResponseImpl implements HttpRicmletResponse{
 	@Override
 	public void setCookie(String name, String value) {
 		// TODO Auto-generated method stub
-		
+		cookies.put(name, value);
 	}
-
 }

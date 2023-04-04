@@ -2,6 +2,7 @@ package httpserver.itf.impl;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Date;
+import java.util.HashMap;
 
 import httpserver.itf.HttpRequest;
 import httpserver.itf.HttpResponse;
@@ -13,7 +14,8 @@ class HttpResponseImpl implements HttpResponse {
 	protected HttpServer m_hs;
 	protected PrintStream m_ps;
 	protected HttpRequest m_req;
-
+	
+	
 	protected HttpResponseImpl(HttpServer hs, HttpRequest req, PrintStream ps) {
 		m_hs = hs;
 		m_req = req;
@@ -54,5 +56,4 @@ class HttpResponseImpl implements HttpResponse {
 		m_ps.println(); 
 		return m_ps;
 	}
-
 }

@@ -33,7 +33,7 @@ public class HttpServer {
 	private int m_port;
 	private File m_folder;  // default folder for accessing static resources (files)
 	private ServerSocket m_ssoc;
-	private HashMap<String, Class<?>> classes;
+	private HashMap<String, HttpRicmlet> classes;
 
 	protected HttpServer(int port, String folderName) {
 		m_port = port;
@@ -54,7 +54,7 @@ public class HttpServer {
 		return m_folder;
 	}
 	
-	public HashMap<String, Class<?>> getHashMap(){
+	public HashMap<String, HttpRicmlet> getHashMap(){
 		return this.classes;
 	}
 	
@@ -67,12 +67,9 @@ public class HttpServer {
 		if(!classes.containsKey(clsname)) {
 			c = Class.forName(clsname); //Creates the class
 			ricmlet = (HttpRicmlet)c.getDeclaredConstructor().newInstance();
-			classes.put(clsname, c);
-		}else {
-			c = classes.get(clsname);
-			ricmlet = (HttpRicmlet)c.getDeclaredConstructor().newInstance();
+			classes.put(clsname, ricmlet);
 		}
-		return ricmlet;
+		return classes.get(clsname);
 	}
 
 
