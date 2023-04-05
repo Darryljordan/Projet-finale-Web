@@ -7,7 +7,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import httpserver.itf.HttpRequest;
@@ -16,6 +18,7 @@ import httpserver.itf.HttpRicmlet;
 import httpserver.itf.HttpRicmletRequest;
 import httpserver.itf.HttpRicmletRequestImpl;
 import httpserver.itf.HttpRicmletResponseImpl;
+import httpserver.itf.Session;
 
 
 /**
@@ -34,6 +37,8 @@ public class HttpServer {
 	private File m_folder;  // default folder for accessing static resources (files)
 	private ServerSocket m_ssoc;
 	private HashMap<String, HttpRicmlet> classes;
+	public List<Session> sessions = new ArrayList<Session>();
+	public int sessionCount = 0;
 
 	protected HttpServer(int port, String folderName) {
 		m_port = port;
@@ -112,8 +117,8 @@ public class HttpServer {
 	 * Returns an HttpResponse object associated to the given HttpRequest object
 	 */
 	public HttpResponse getResponse(HttpRequest req, PrintStream ps) {
-		if(req instanceof HttpRicmletRequestImpl) {
-			return new HttpRicmletResponseImpl(this, req, ps);
+		if(req instanceof HttpRicmletRequest) {
+			return new HttpRicmletResponseImpl(this,(HttpRicmletRequest)req, ps);
 		}
 		return new HttpResponseImpl(this, req, ps);
 	}

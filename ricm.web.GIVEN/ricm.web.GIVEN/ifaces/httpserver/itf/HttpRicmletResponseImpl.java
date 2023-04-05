@@ -11,10 +11,10 @@ public class HttpRicmletResponseImpl implements HttpRicmletResponse{
 	
 	protected HttpServer m_hs;
 	protected PrintStream m_ps;
-	protected HttpRequest m_req;
+	protected HttpRicmletRequest m_req;
 	protected HashMap<String, String> cookies = new HashMap<String, String>();
 
-	public HttpRicmletResponseImpl(HttpServer hs, HttpRequest req, PrintStream ps) {
+	public HttpRicmletResponseImpl(HttpServer hs, HttpRicmletRequest req, PrintStream ps) {
 		m_hs = hs;
 		m_req = req;
 		m_ps = ps;
@@ -28,6 +28,7 @@ public class HttpRicmletResponseImpl implements HttpRicmletResponse{
 			m_ps.println("Set-Cookie: " + name + "=" + value);
 		});
 		m_ps.println("Server: ricm-http 1.0");
+		m_ps.println("Set-Cookie: session-id=" + m_req.getSession().getId());
 	}
 
 	@Override

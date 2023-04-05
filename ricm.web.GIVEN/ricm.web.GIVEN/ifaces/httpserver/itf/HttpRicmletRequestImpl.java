@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.StringTokenizer;
 
 import httpserver.itf.impl.HttpServer;
@@ -13,6 +14,7 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest{
 	
 	
 	protected HashMap<String, String> cookies = new HashMap<String, String>();
+	protected Session session;
 	
 	public HttpRicmletRequestImpl(HttpServer hs, String method, String ressname, BufferedReader br) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		super(hs, method, ressname, br);
@@ -20,7 +22,7 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest{
 		String nextLine = null;
 		while(!(nextLine = br.readLine()).equals("")) {
 			if(nextLine.contains("Cookie:")) {
-				System.out.println("Problem in constructor of RICMLET request");
+				//System.out.println("Problem in constructor of RICMLET request");
 				String[] draftLine = nextLine.split(" ", 2);
 				String cookie = draftLine[1];
 				String[] cookieTable = cookie.split("; ");
@@ -30,12 +32,33 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest{
 				}
 			}
 		}
+		if(getCookie("session-id") == null) {
+			session = new Session(String.valueOf(m_hs.sessionCount), m_hs);
+			m_hs.sessionCount++;
+			m_hs.sessions.add(session);
+		} else {
+			boolean find = false;
+			Iterator<Session> list = m_hs.sessions.iterator();
+			while(list.hasNext() && find == false) {
+				Session currentSession = list.next();
+				if(currentSession.getId().equals(getCookie("session-id"))) {
+					//currentSession.newTimer();
+					session = currentSession;
+					find = true;
+				}
+			}
+			if(find == false) {
+				session = new Session(String.valueOf(m_hs.sessionCount), m_hs);
+				m_hs.sessionCount++;
+				m_hs.sessions.add(session);
+			}
+		}
 	}
 
 	@Override
 	public HttpSession getSession() {
 		// TODO Auto-generated method stub
-		return null;
+		return session;
 	}
 
 	@Override
