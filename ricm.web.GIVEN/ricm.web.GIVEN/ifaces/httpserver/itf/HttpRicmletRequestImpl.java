@@ -101,16 +101,15 @@ public class HttpRicmletRequestImpl extends HttpRicmletRequest{
 			System.out.println(clsname);
 			file = new File(this.m_hs.getFolder() + this.getRessname() + ".java");
 		}
-			try {
-				System.out.println(clsname);
-				HttpRicmlet ricmlet = this.m_hs.getInstance(clsname);
-				System.out.println(clsname + " After getting the instance");
-				System.out.println(this);
-				ricmlet.doGet(this, (HttpRicmletResponse)resp);
-			} catch (ClassNotFoundException e) {
-				System.out.println("Error : Launching the class : " + e.getMessage() + " " + e.getStackTrace());
-				resp.setReplyError(404, "Error : Launching the class");
+		try {
+			System.out.println(clsname);
+			HttpRicmlet ricmlet = this.m_hs.getInstance(clsname);
+			System.out.println(clsname + " After getting the instance");
+			System.out.println(this);
+			ricmlet.doGet(this, (HttpRicmletResponse)resp);
+		} catch (ClassNotFoundException e) {
+			System.out.println("Error : Launching the class : " + e.getMessage() + " " + e.getStackTrace());
+			resp.setReplyError(404, "Error : Launching the class");
 		}
-		
 	}
 }

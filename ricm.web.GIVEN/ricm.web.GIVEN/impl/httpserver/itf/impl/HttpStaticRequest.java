@@ -21,6 +21,7 @@ public class HttpStaticRequest extends HttpRequest {
 	public void process(HttpResponse resp) throws Exception {
 	// TO COMPLETE
 		File file = new File(this.m_hs.getFolder(), m_ressname);
+		System.out.println(file.getAbsolutePath());
 		//System.out.println(file.getPath());
 		HttpResponseImpl res = (HttpResponseImpl) resp;
 		if(file.exists()) {
